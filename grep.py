@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""Usage: grep.py PATTERN FILE
+"""Usage: grep.py PATTERN FILE...
 
-Search for lines in FILE containing PATTERN.
+Search for lines in FILE(S) containing PATTERN.
 PATTERN can be regex.
 """
 # = __doc__
@@ -13,24 +13,31 @@ except ModuleNotFoundError:
     print("regex module not found, using re", file=sys.stderr)
     import re
 
+
 def parse_argv(argv):
-    try:
-        pattern, path = argv
-        return pattern, path
-    except ValueError:
+    if len(argv) < 2:
         print(__doc__.strip(), file=sys.stderr)
         sys.exit(1)
+    else:
+        return argv[0], argv[1:]
+
+
+def grep(file, pattern):
+    for line in file:
+        if re.search(pattern, line):
+            print(line, end="")
+
 
 def main(argv):
-    pattern, path = parse_argv(argv)
-    try:
-        with open(path) as file:
-            for line in file:
-                if re.search(pattern, line):
-                    print(line, end="")
-    except FileNotFoundError:
-        print("file not found:", path, file=sys.stderr)
-        sys.exit(1)
-        
+    pattern, paths = parse_argv(argv)
+    for path in paths:
+        try:
+            with open(path) as file:
+                grep(file, pattern)
+        except FileNotFoundError:
+            print("file not found:", path, file=sys.stderr)
+            sys.exit(1)
+
+
 if __name__ == "__main__":
     main(sys.argv[1:])
