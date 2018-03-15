@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import sys
+import regex as re
 
-with open(sys.argv[2]) as file:
+pattern, path = sys.argv[1:]
+with open(path) as file:
     for line in file:
-        if sys.argv[1] in line:
+        if re.search(pattern, line):
             print(line, end="")
